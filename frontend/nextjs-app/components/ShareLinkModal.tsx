@@ -10,8 +10,8 @@ const ShareLinkModal: React.FC<ShareLinkModalProps> = ({ fileId, onClose }) => {
 
   const generateShareLink = async () => {
     try {
-      const response = await fetch(`/api/files/${fileId}/share`, {
-        method: 'POST',
+      const response = await fetch(`/api/files/share/${fileId}`, {
+        method: 'GET',
       });
 
       if (response.ok) {

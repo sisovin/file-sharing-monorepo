@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { File } from './entities/file.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class FilesService {
@@ -28,5 +29,18 @@ export class FilesService {
     await this.prisma.file.delete({
       where: { id },
     });
+  }
+
+  async generateShareLink(id: string): Promise<string> {
+    const shareLink = uuidv4();
+    await this.prisma.file.update({
+      where: { id },
+      data: { shareLink },
+    });
+    return shareLink;
+  }
+
+  async downloadFileById(id: string): Promise<File> {
+    return this.getFileById(id);
   }
 }

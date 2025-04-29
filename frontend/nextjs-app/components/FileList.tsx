@@ -9,9 +9,11 @@ interface File {
 
 interface FileListProps {
   files: File[];
+  onGenerateShareLink: (fileId: string) => void;
+  onDownloadFile: (fileId: string) => void;
 }
 
-const FileList: React.FC<FileListProps> = ({ files }) => {
+const FileList: React.FC<FileListProps> = ({ files, onGenerateShareLink, onDownloadFile }) => {
   return (
     <div className="file-list">
       <h2 className="text-xl font-bold mb-4">Uploaded Files</h2>
@@ -22,6 +24,12 @@ const FileList: React.FC<FileListProps> = ({ files }) => {
               <span className="file-name">{file.name}</span>
               <span className="file-size">{(file.size / 1024).toFixed(2)} KB</span>
               <span className="file-uploaded-at">{new Date(file.uploadedAt).toLocaleString()}</span>
+              <button onClick={() => onGenerateShareLink(file.id)} className="btn btn-primary ml-2">
+                Share
+              </button>
+              <button onClick={() => onDownloadFile(file.id)} className="btn btn-secondary ml-2">
+                Download
+              </button>
             </div>
           </li>
         ))}
