@@ -35,4 +35,11 @@ export class UsersService {
       where: { id },
     });
   }
+
+  async updateUserSubscription(userId: number, plan: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { subscriptionPlan: plan },
+    });
+  }
 }
