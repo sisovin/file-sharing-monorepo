@@ -30,7 +30,40 @@ export class FilesService {
     return data.Key;
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<File> {
+  async checkUserSubscription(userId: number): Promise<{ plan: string, fileLimit: number }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    let fileLimit;
+    switch (user.subscriptionPlan) {
+      case 'Pro':
+        fileLimit = 100;
+        break;
+      case 'Light':
+        fileLimit = 10;
+        break;
+      default:
+        fileLimit = 0;
+    }
+
+    return { plan: user.subscriptionPlan, fileLimit };
+  }
+
+  async uploadFile(file: Express.Multer.File, userId: number): Promise<File> {
+    const { fileLimit } = await this.checkUserSubscription(userId);
+    const userFilesCount = await this.prisma.file.count({
+      where: { userId },
+    });
+
+    if (userFilesCount >= fileLimit) {
+      throw new Error('File upload limit reached for your subscription plan');
+    }
+
     const filePath = await this.uploadFileToSupabase(file);
 
     const newFile = await this.prisma.file.create({
@@ -39,6 +72,7 @@ export class FilesService {
         path: filePath,
         mimetype: file.mimetype,
         size: file.size,
+        userId,
       },
     });
     return newFile;

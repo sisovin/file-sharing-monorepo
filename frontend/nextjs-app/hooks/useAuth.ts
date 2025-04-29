@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { api } from '../utils/api';
 import { AuthContextType, User } from '../types/auth';
 import { supabase } from '../utils/supabaseClient';
+import { loadStripe } from '@stripe/stripe-js';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -49,8 +50,14 @@ export const AuthProvider: React.FC = ({ children }) => {
     router.push('/auth/login');
   };
 
+  const subscribeToPlan = async (planId: string) => {
+    const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+    const { sessionId } = await api.post('/create-checkout-session', { planId });
+    await stripe.redirectToCheckout({ sessionId });
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, subscribeToPlan }}>
       {children}
     </AuthContext.Provider>
   );

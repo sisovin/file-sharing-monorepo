@@ -3,6 +3,7 @@ import FileUpload from '../../components/FileUpload';
 import FileList from '../../components/FileList';
 import ShareLinkModal from '../../components/ShareLinkModal';
 import useFiles from '../../hooks/useFiles';
+import SubscriptionPlans from '../../components/SubscriptionPlans';
 
 const Dashboard: React.FC = () => {
   const { files, loading, error } = useFiles();
@@ -39,6 +40,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <SubscriptionPlans />
       <FileUpload />
       {loading && <p>Loading files...</p>}
       {error && <p>Error loading files: {error}</p>}
