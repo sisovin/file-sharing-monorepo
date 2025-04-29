@@ -9,14 +9,27 @@ export class FilesController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return this.filesService.uploadFile(file);
   }
 
   @Get('download/:id')
   async downloadFile(@Param('id') id: string, @Res() res: Response) {
     const file = await this.filesService.getFileById(id);
-    res.download(file.path, file.filename);
+    const { data, error } = await this.filesService.supabase.storage
+      .from('files')
+      .download(file.path);
+
+    if (error) {
+      throw new Error(`Failed to download file from Supabase: ${error.message}`);
+    }
+
+    res.set({
+      'Content-Type': file.mimetype,
+      'Content-Disposition': `attachment; filename="${file.filename}"`,
+    });
+
+    res.send(data);
   }
 
   @Get('share/:id')
