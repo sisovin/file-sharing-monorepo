@@ -1,20 +1,32 @@
-import { api } from './api';
+import { supabase } from './supabaseClient';
 
 export const login = async (email: string, password: string) => {
-  const { data } = await api.post('/auth/login', { email, password });
-  return data;
+  const { user, error } = await supabase.auth.signIn({ email, password });
+  if (error) {
+    throw new Error(error.message);
+  }
+  return user;
 };
 
 export const register = async (email: string, password: string) => {
-  const { data } = await api.post('/auth/register', { email, password });
-  return data;
+  const { user, error } = await supabase.auth.signUp({ email, password });
+  if (error) {
+    throw new Error(error.message);
+  }
+  return user;
 };
 
 export const logout = async () => {
-  await api.post('/auth/logout');
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(error.message);
+  }
 };
 
 export const getCurrentUser = async () => {
-  const { data } = await api.get('/auth/me');
-  return data;
+  const user = supabase.auth.user();
+  if (!user) {
+    throw new Error('No user is currently logged in');
+  }
+  return user;
 };

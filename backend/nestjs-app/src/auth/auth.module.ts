@@ -4,16 +4,17 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { SupabaseStrategy } from './strategies/supabase.strategy';
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.register({
-      secret: 'your_jwt_secret_key',
-      signOptions: { expiresIn: '60m' },
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, SupabaseStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
